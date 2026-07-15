@@ -221,7 +221,10 @@
     </div>
 
     <div style="margin-top:14px;">
-      <div class="hint" style="margin-top:0;">Row colors — overrides the default text color for a specific row. Column colors — overrides it for a specific column. If both are set for a cell, row color wins.</div>
+      <div class="hint" style="margin-top:0;">Column names — shown on the board header and above the data table below.</div>
+      <div class="controls" id="colNameControls" style="margin-top:8px;"></div>
+
+      <div class="hint" style="margin-top:10px;">Row colors — overrides the default text color for a specific row. Column colors — overrides it for a specific column. If both are set for a cell, row color wins.</div>
       <div class="controls" id="rowColorControls" style="margin-top:8px;"></div>
       <div class="controls" id="colColorControls" style="margin-top:2px;"></div>
     </div>
@@ -231,7 +234,7 @@
     <h2>Flight Data</h2>
     <table class="rows">
       <thead>
-        <tr><th style="width:8%">Move</th><th style="width:15%">Flight</th><th>Destination</th><th style="width:11%">Gate</th><th style="width:13%">Depart</th></tr>
+        <tr><th style="width:8%">Move</th><th id="thColFlight" style="width:15%">Flight</th><th id="thColDest">Destination</th><th id="thColGate" style="width:11%">Gate</th><th id="thColDepart" style="width:13%">Depart</th></tr>
       </thead>
       <tbody id="rowInputs"></tbody>
     </table>
@@ -413,6 +416,30 @@
       const tmp = a.value; a.value = b.value; b.value = tmp;
     });
   }
+
+  // ---------- Column name controls ----------
+  const COL_TH_IDS = ['thColFlight','thColDest','thColGate','thColDepart'];
+  const colNameHost = document.getElementById('colNameControls');
+  COLS.forEach((c,ci)=>{
+    const wrap = document.createElement('label');
+    wrap.className = 'check';
+    wrap.style.gap = '4px';
+    const inp = document.createElement('input');
+    inp.type='text';
+    inp.value = c.label;
+    inp.maxLength = 14;
+    inp.style.cssText = 'width:120px; background:#111; border:1px solid #3a382f; color:inherit; font-family:var(--mono); font-size:12px; padding:5px 6px; border-radius:3px; text-transform:uppercase;';
+    wrap.appendChild(document.createTextNode('Col '+(ci+1)+' '));
+    wrap.appendChild(inp);
+    colNameHost.appendChild(wrap);
+    inp.addEventListener('input', ()=>{
+      const val = inp.value.trim().toUpperCase() || c.label;
+      c.label = val;
+      const th = document.getElementById(COL_TH_IDS[ci]);
+      if(th) th.textContent = val.charAt(0)+val.slice(1).toLowerCase();
+      renderStatic();
+    });
+  });
 
   // ---------- Row / column color controls ----------
   const rowColorHost = document.getElementById('rowColorControls');
